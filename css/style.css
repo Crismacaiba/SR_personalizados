@@ -614,6 +614,7 @@ header .wrap {
 .prod img {
   display: block;
   width: 100%;
+  height: auto;             /* ignora o height="600" do HTML: todas as fotos no mesmo tamanho */
   aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: 18px;
