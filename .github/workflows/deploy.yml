@@ -23,23 +23,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extrair zip enviado (se houver)
+      # Qualquer .zip enviado e extraido na pasta onde foi enviado e depois apagado.
+      # Zips enviados dentro de subpastas (ex.: images/kits) tem as fotos jpg/png
+      # convertidas para .webp (max. 800px), com nomes sem espacos/acentos.
+      - name: Extrair zips enviados (se houver)
         run: |
           shopt -s nullglob
-          zips=(*.zip)
-          if [ ${#zips[@]} -gt 0 ]; then
-            for z in "${zips[@]}"; do
-              tmp=$(mktemp -d)
-              unzip -o -q "$z" -d "$tmp"
-              entries=("$tmp"/*)
-              if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then src="${entries[0]}"; else src="$tmp"; fi
-              cp -a "$src"/. .
-              git rm -q "$z"
-            done
+          mudou=0
+          while IFS= read -r -d '' z; do
+            dest=$(dirname "$z")
+            tmp=$(mktemp -d)
+            unzip -o -q "$z" -d "$tmp"
+            rm -rf "$tmp/__MACOSX"
+            entries=("$tmp"/*)
+            if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then src="${entries[0]}"; else src="$tmp"; fi
+            if [ "$dest" != "." ]; then
+              python3 -c "import PIL" 2>/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-pil; }
+              python3 - "$src" <<'PY'
+          import sys, re, unicodedata, pathlib
+          from PIL import Image, ImageOps
+          for f in list(pathlib.Path(sys.argv[1]).rglob('*')):
+              if f.suffix.lower() in ('.jpg', '.jpeg', '.png'):
+                  s = unicodedata.normalize('NFKD', f.stem).encode('ascii', 'ignore').decode().lower()
+                  s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+                  im = ImageOps.exif_transpose(Image.open(f)).convert('RGB')
+                  im.thumbnail((800, 800))
+                  im.save(f.with_name(s + '.webp'), 'WEBP', quality=80)
+                  f.unlink()
+          PY
+            fi
+            mkdir -p "$dest"
+            cp -a "$src"/. "$dest"/
+            git rm -q "$z"
+            mudou=1
+          done < <(find . -name '*.zip' -not -path './.git/*' -print0)
+          if [ "$mudou" -eq 1 ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
-            git commit -m "Extrai arquivos do zip"
+            git commit -m "Extrai arquivos dos zips"
             git push
           fi
 
