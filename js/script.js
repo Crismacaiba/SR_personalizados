@@ -15,11 +15,11 @@ var iconeGrade = '<svg class="icone-grade" width="22" height="22" viewBox="0 0 2
 
 // Galeria do catálogo: uma foto ao lado da outra, arrastando para o lado
 // pasta = pasta dentro de images/ | lista = [{ imagem, nome }]
-function galeria(pasta, lista) {
+function galeria(pasta, lista, link) {
   var fotos = lista.map(function (item) {
     return `<img src="images/${pasta}/${item.imagem}.webp" alt="${item.nome}" width="600" height="600" loading="lazy" draggable="false">`;
   }).join('');
-  return `<div class="galeria">${fotos}</div>`;
+  return `<div class="galeria" data-link="${link || ''}">${fotos}</div>`;
 }
 
 var Pages = {};
@@ -189,6 +189,13 @@ Pages.home = {
     // --- Carrossel e galerias: no computador dá para arrastar com o mouse ---
     app.querySelectorAll('.track, .galeria').forEach(arrastarComMouse);
 
+    // --- Catálogo: clicar numa foto abre a página da categoria ---
+    app.querySelectorAll('.galeria[data-link]').forEach(function (galeria) {
+      galeria.addEventListener('click', function (e) {
+        if (e.target.tagName === 'IMG' && galeria.dataset.link) location.hash = galeria.dataset.link;
+      });
+    });
+
     // --- Sobre nós e FAQ ---
     Pages.sobre.init(app);
     Pages.faq.init(app);
@@ -211,21 +218,21 @@ Pages.catalogo = {
   <article class="produto">
     <h3>Canecas</h3>
     <p>Personalize seus momentos com canecas exclusivas: designs criativos, qualidade e muito estilo para o seu café do dia a dia.</p>
-    ${galeria('canecas', canecas)}
+    ${galeria('canecas', canecas, '#/canecas')}
     <a class="botao" href="${linkZap('Olá! Gostaria de pedir um orçamento de Canecas.')}" target="_blank" rel="noopener">${iconeZap}Pedir orçamento</a>
   </article>
 
   <article class="produto">
     <h3>Camisetas</h3>
     <p>Camisetas que têm a sua cara: conforto e muito detalhe, ótimas para grupos, eventos e para divulgar o seu sonho.</p>
-    ${galeria('camisetas', camisetas)}
+    ${galeria('camisetas', camisetas, '#/camisetas')}
     <a class="botao" href="${linkZap('Olá! Gostaria de pedir um orçamento de Camisetas.')}" target="_blank" rel="noopener">${iconeZap}Pedir orçamento</a>
   </article>
 
   <article class="produto">
     <h3>Kits especiais</h3>
     <p>Kits preparados com carinho para momentos inesquecíveis: presentes, lembrancinhas e combinações perfeitas para celebrar e agradecer.</p>
-    ${galeria('kits', kits)}
+    ${galeria('kits', kits, '#/kits')}
     <a class="botao botao-pilula" href="${linkZap('Olá! Vim pelo site e gostaria de saber mais sobre os Kits Especiais.')}" target="_blank" rel="noopener">${iconeZap}Falar no WhatsApp</a>
   </article>
 </section>`;
