@@ -65,7 +65,7 @@ function arrastarComMouse(faixa) {
 var produtosHome = [
   { nome: 'Canecas',           imagem: 'canecas',           link: '#/canecas' },
   { nome: 'Camisetas',         imagem: 'camisetas',         link: '#/camisetas' },
-  { nome: 'Kits',              imagem: 'kits',              link: '#/catalogo' },
+  { nome: 'Kits',              imagem: 'kits',              link: '#/kits' },
   { nome: 'Copos térmicos',    imagem: 'copos-termicos',    link: '#/catalogo' },
   { nome: 'Garrafas térmicas', imagem: 'garrafas-termicas', link: '#/catalogo' },
   { nome: 'Fraldas de boca',   imagem: 'fraldas-de-boca',   link: '#/catalogo' },
@@ -225,7 +225,7 @@ Pages.catalogo = {
   <article class="produto">
     <h3>Kits especiais</h3>
     <p>Kits preparados com carinho para momentos inesquecíveis: presentes, lembrancinhas e combinações perfeitas para celebrar e agradecer.</p>
-    ${galeria('catalogo', kits)}
+    ${galeria('kits', kits)}
     <a class="botao botao-pilula" href="${linkZap('Olá! Vim pelo site e gostaria de saber mais sobre os Kits Especiais.')}" target="_blank" rel="noopener">${iconeZap}Falar no WhatsApp</a>
   </article>
 </section>`;
@@ -390,11 +390,39 @@ var camisetas = [
   { imagem: 'sua-estampa', nome: 'Camiseta com sua estampa' }
 ];
 
-/* ===== KITS (fotos em images/catalogo/) ===== */
+/* ===== KITS (fotos em images/kits/) ===== */
 var kits = [
-  { imagem: 'kit-calendario', nome: 'Kit caneca e quadro com calendário' },
-  { imagem: 'kit-almofada',   nome: 'Kit caneca e almofada' }
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-1',  nome: 'Kit almofada e caneca “O meu amor é teu”' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-10', nome: 'Kit caneca e quadro com calendário' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-5',  nome: 'Kit almofada Spotify e chaveiros' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-3',  nome: 'Kit casal: canecas e chocolates' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-4',  nome: 'Kit garrafa e caderno com nome' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-8',  nome: 'Kit copo térmico, agenda e chaveiro com nome' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-9',  nome: 'Kit copos térmicos para casal' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44',    nome: 'Kit aniversário' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-6',  nome: 'Kit professora: ecobag e caneca “Gente que ama ensinar”' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-7',  nome: 'Kit professora: ecobag e caneca' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-44-2',  nome: 'Kit Shrek e Fiona: camisetas e caneca' },
+  { imagem: 'whatsapp-image-2026-11-17-at-15-25-45',    nome: 'Kit Player 1 e Player 2: camisetas e canecas' }
 ];
+
+Pages.kits = {
+  title: 'Kits | SR Personalizados',
+  render: function () {
+    var cartoes = kits.map(function (k) {
+      return `<article class="prod">
+        <img src="images/kits/${k.imagem}.webp" alt="${k.nome}" loading="lazy">
+        <h3>${k.nome}</h3>
+        <a class="botao" href="${linkZap('Olá! Quero saber mais sobre: ' + k.nome)}" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+      </article>`;
+    }).join('');
+    return `<div class="wrap"><section class="secao">
+      <h2 class="titulo-grande">Kits especiais</h2>
+      <p class="intro">Kits preparados com carinho para presentear e celebrar. Todos podem ser personalizados com nomes, fotos e frases: fale com a gente pelo WhatsApp.</p>
+      <div class="grid">${cartoes}</div>
+    </section></div>`;
+  }
+};
 
 Pages.camisetas = {
   title: 'Camisetas | SR Personalizados',
@@ -436,7 +464,7 @@ function marcarMenu(nome) {
 
 // Na Home, descobre qual seção está na tela e destaca no menu
 function acompanharRolagem() {
-  if (paginaAtual === 'canecas' || paginaAtual === 'camisetas') {
+  if (paginaAtual === 'canecas' || paginaAtual === 'camisetas' || paginaAtual === 'kits') {
     marcarMenu('catalogo');
     return;
   }
@@ -455,7 +483,7 @@ function acompanharRolagem() {
 // Mostra a página certa de acordo com o endereço (#/canecas, #/faq, ...)
 function mostrarPagina() {
   var rota = location.hash.replace('#/', '');          // '' | 'canecas' | 'camisetas' | 'catalogo' | 'sobre' | 'faq'
-  var nome = (rota === 'canecas' || rota === 'camisetas') ? rota : 'home';
+  var nome = (rota === 'canecas' || rota === 'camisetas' || rota === 'kits') ? rota : 'home';
 
   // só monta a página de novo se ela mudou
   if (nome !== paginaAtual) {
